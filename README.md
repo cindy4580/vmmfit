@@ -1,2 +1,2 @@
 # vmmfit
-A backup version for von Mises Mixture distribution
+A version control for von Mises Mixture distribution
