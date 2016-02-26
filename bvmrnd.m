@@ -15,13 +15,13 @@ function r = bvmrnd(mu, kappa, lambda, n)
 
 %% Check Inputs
 if nargin < 3 || isempty(mu) || isempty(kappa) || isempty(lambda)
-    error(message('stats:bvmrnd:TooFewInputs'));
+    error('stats:bvmrnd:TooFewInputs');
 elseif ~isvector(mu) || ~isvector(kappa) || ~isscalar(lambda)
-    error(message('stats:bvmrnd:BadMuKappaLambda'));
+    error('stats:bvmrnd:BadMuKappaLambda');
 elseif size(mu,2) ~= size(kappa,2) || size(mu,2) ~= 2
-    error(message('stats:bvmrnd:MuKappaSizeMismatch'));
+    error('stats:bvmrnd:MuKappaSizeMismatch');
 elseif any(kappa < 0)
-    error(message('stats:bvmrnd:NegativeKappa'));
+    error('stats:bvmrnd:NegativeKappa');
 end
 
 if nargin < 4
@@ -40,7 +40,7 @@ end
 P = diag(kappa) - lambda * flip(eye(2));
 [~,num] = cholcov(P);
 if num ~= 0
-   error(message('stats:bvmrnd:BadP:KappawithLambda'));
+   error('stats:bvmrnd:BadP:KappawithLambda');
 end
 
 %% Generation

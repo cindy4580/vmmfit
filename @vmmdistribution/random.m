@@ -11,7 +11,7 @@ function [y, compIdx] = random(obj,n)
 %   indicates the component used to generate each row of Y
 %
 %   Reference: MATLAB MACHINE LEARNING TOOLBOX
-%   Copyright: Xindi Li xindi.li@stonybrook.edu
+%   Copyright: Xindi Li (xindi.li@stonybrook.edu)
 
 % Check Inputs
 if nargin < 2 || isempty(n)

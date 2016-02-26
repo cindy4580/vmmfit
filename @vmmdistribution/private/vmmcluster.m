@@ -98,27 +98,27 @@ if isstruct(start)
     initPara = checkInitParam(start,k,d);
     start = 'Parameter';
     if reps ~= 1
-        error(message('stats:vmmdistribution:ConflictReps'));
+        error('stats:vmmdistribution:ConflictReps');
     end
 elseif isvector(start) && isnumeric(start)
     if length(start) ~= n
-        error(message('stats:vmmdistribution:MisshapedInitIdx'));
+        error('stats:vmmdistribution:MisshapedInitIdx');
     end
     if ~all(ismember(start, 1:k) )  || ~all(ismember(1:k,start)) % Index
-        error(message('stats:vmmdistribution:WrongInitIdx'));
+        error('stats:vmmdistribution:WrongInitIdx');
     end
     initIdx = start;
     start   = 'Partition';
     if reps ~=1
-        error(message('stats:vmmdistribution:ConflictReps'));
+        error('stats:vmmdistribution:ConflictReps');
     end
 elseif ischar(start)
     if ~strncmpi(start,'RandSample',length(start))
-        error(message('stats:vmmdistribution:BadStart'));
+        error('stats:vmmdistribution:BadStart');
     end
     start = 'RandSample';
 else
-    error(message('stats:vmmdistribution:BadStart'));    
+    error('stats:vmmdistribution:BadStart');    
 end % Start check
 
 %% Initialization
@@ -148,9 +148,9 @@ for t = 1 : reps
         
         if ~optimInfo0.Converged
             if reps == 1
-                warning(message('stats:vmmdistribution:FailedToConverge',options.MaxIter,k));
+                warning('stats:vmmdistribution:FailedToConverge',options.MaxIter,k);
             else
-                warning(message('stats:vmmdistribution:FailedToConvergeReps',options.MaxIter,t,k));
+                warning('stats:vmmdistribution:FailedToConvergeReps',options.MaxIter,t,k);
             end
         end % Check convergency
         
@@ -169,10 +169,10 @@ for t = 1 : reps
             rethrow(ME);
         else
             illCondCnt = illCondCnt + 1;
-            warning(message('stats:vmmdistribution:NotUnimodal', t, k, ...
+            warning('stats:vmmdistribution:NotUnimodal', t, k, ...
                 ME.message( strfind( ME.message, sprintf( '\n' ) ) + 1:end )));
             if illCondCnt == reps
-                m = message('stats:vmmdistribution:NotUnimodalAllReps');
+                m = 'stats:vmmdistribution:NotUnimodalAllReps';
                 throwAsCaller(MException(m.Identifier,'%s',getString(m)));
             end
         end
@@ -291,9 +291,9 @@ function initParam = checkInitParam(initParam,k,d)
 % Check for mixing weights
 if isfield(initParam, 'Pcomponents') && ~isempty(initParam.Pcomponents)
     if ~isvector(initParam.Pcomponents) || length(initParam.Pcomponents)~=k
-        error(message('stats:vmmdistribution:MisshapedInitP'));
+        error('stats:vmmdistribution:MisshapedInitP');
     elseif any(initParam.Pcomponents <= 0)
-        error(message('stats:vmmdistribution:InvalidP'));
+        error('stats:vmmdistribution:InvalidP');
     elseif size(initParam.Pcomponents,2) ~=1
         initParam.Pcomponents = initParam.Pcomponents';
     end
@@ -305,34 +305,34 @@ initParam.Pcomponents = initParam.Pcomponents/sum(initParam.Pcomponents);
 % Check for mean directions
 if isfield(initParam,'Mu') && ~isempty(initParam.Mu)
     if ~isequal(size(initParam.Mu),[k,d])
-        error(message('stats:vmmdistribution:MisshapedInitMu'));
+        error('stats:vmmdistribution:MisshapedInitMu');
     elseif any(initParam.Mu(:) > pi) || any(initParam.Mu(:) < -pi)
-        error(message('stats:vmmdistribution:BeyondBoundaryInitMu'));
+        error('stats:vmmdistribution:BeyondBoundaryInitMu');
     end
 else
-    error(message('stats:vmmdistribution:MissingInitMu'));
+    error('stats:vmmdistribution:MissingInitMu');
 end
 
 % Check for concentration parameters
 if isfield(initParam,'Kappa') && ~isempty(initParam.Kappa)
     if ~isequal(size(initParam.Kappa),[k,d])
-        error(message('stats:vmmdistribution:MisshapedInitKappa'));
+        error('stats:vmmdistribution:MisshapedInitKappa');
     elseif any(initParam.Kappa(:) <= 0)
-        error(message('stats:vmmdistribution:InvalidKappa'));
+        error('stats:vmmdistribution:InvalidKappa');
     end
 else
-    error(message('stats:vmmdistribution:MissingInitKappa'));
+    error('stats:vmmdistribution:MissingInitKappa');
 end
 
 % Check for relation parameters
 if isfield(initParam,'Lambda') && ~isempty(initParam.Lambda)
     if ~isvector(initParam.Lambda) || length(initParam.Lambda) ~= k
-        error(message('stats:vmmdistribution:MisshapedInitL'));
+        error('stats:vmmdistribution:MisshapedInitL');
     elseif size(initParam.Lambda,2) ~=1
         initParam.Lambda = initParam.Lambda';
     end
 else
-    error(message('stats:vmmdistribution:MissingInitLambda'));
+    error('stats:vmmdistribution:MissingInitLambda');
 end
 
 % Check for unimodal von Mises distribution
@@ -340,7 +340,7 @@ for i = 1 : k
     P = diag(initParam.Kappa(i,:)) - initParam.Lambda(i) * flip(eye(2));
     [~, num] = cholcov(P);
     if num ~= 0
-        error(message('stats:vmmdistribution:BadInitKappaWithLambda'));
+        error('stats:vmmdistribution:BadInitKappaWithLambda');
     end
 end % Unimode check
 

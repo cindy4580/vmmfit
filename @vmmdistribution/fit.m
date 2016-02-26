@@ -8,39 +8,39 @@ function obj = fit(X,k,varargin)
 
 % Check inputs
 if nargin < 2
-    error(message('stats:vmmdistribution:TooFewInputs'));
+    error('stats:vmmdistribution:TooFewInputs');
 end 
 
 checkdata(X); % X is matrix, dimensions match and in radians
 
 if ~isscalar(k) || ~isnumeric(k) || ~isfinite(k) || k < 1 || k ~= round(k)
-    error(message('stats:vmmdistribution:BadK'));
+    error('stats:vmmdistribution:BadK');
 end
 
 % Remove NaNs from X
 wasnan = any(isnan(X),2);
 hadNaNs = any(wasnan);
 if hadNaNs
-    warning(message('stats:vmmdistribution:MissingData'));
+    warning('stats:vmmdistribution:MissingData');
     X = X(~wasnan,:);
 end
 
 % Dimension check 
 [n, d] = size(X);
 if d ~= 2
-    error(message('stats:vmmdistribution:2D-DataOnly'));
+    error('stats:vmmdistribution:2D-DataOnly');
 end
 if n <= d
-    error(message('stats:vmmdistribution:TooFewPoints'));
+    error('stats:vmmdistribution:TooFewPoints');
 end
 if n <= k
-    error(message('stats:vmmdistribution:TooManyClusters'));
+    error('stats:vmmdistribution:TooManyClusters');
 end
 
 varX = var(X);
 I = find(varX < eps(max(varX)) * n); % Dimension which has zero variance
 if ~isempty(I)
-    error(message('stats:vmmdistribution:ZeroVariance', num2str(I)));
+    error('stats:vmmdistribution:ZeroVariance', num2str(I));
 end
 
 % Parse input and error check
@@ -52,18 +52,18 @@ dftopt = statset('TolFun',1e-6,'MaxIter',100,'Display','off');
 options = statset(dftopt,options);
 
 if ~isnumeric(reps) || ~isscalar(reps) || round(reps) ~= reps || reps < 1
-    error(message('stats:vmmdistribution:BadReps'));
+    error('stats:vmmdistribution:BadReps');
 end
 
 if ischar(Cortype)
     covNames = {'Sine','Cosine'};
     i = find(strncmpi(Cortype,covNames,length(Cortype)));
     if isempty(i)
-        error(message('stats:vmmdistribution:UnknownCortype', Cortype));
+        error('stats:vmmdistribution:UnknownCortype', Cortype);
     end
     Cortype = i;
 else
-    error(message('stats:vmmdistribution:InvalidCortype'));
+    error('stats:vmmdistribution:InvalidCortype');
 end
 
 options.Display = find(strncmpi(options.Display,{'off','notify','final',...

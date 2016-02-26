@@ -10,11 +10,11 @@ function y = pdf(X,obj,num)
 %   See also VMMDISTRIBUTION, VMMDISTRIBUTION/CDF
 %
 %   Reference: MATLAB MACHINE LEARNING TOOLBOX
-%   Copyright: Xindi Li xindi.li@stonybrook.edu
+%   Copyright: Xindi Li (xindi.li@stonybrook.edu)
 
 % Check for valid input
 if nargin ~= 3
-    error(message('stats:vmmdistribution:pdf:TooFewInputs'));
+    error('stats:vmmdistribution:pdf:TooFewInputs');
 end
 checkdata(X,obj);
 

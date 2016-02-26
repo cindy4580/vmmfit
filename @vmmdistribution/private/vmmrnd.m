@@ -29,37 +29,37 @@ function [y, compIdx] = vmmrnd(mu,kappa,lambda,p,type,n)
 
 %% Check Inputs
 if nargin < 3 || isempty(mu) || isempty(kappa) || isempty(lambda)
-    error(message('stats:vmmdistribution:vmmrnd:TooFewInputs'));
+    error('stats:vmmdistribution:vmmrnd:TooFewInputs');
 elseif ~ismatrix(mu)
-    error(message('stats:vmmdistribution:vmmrnd:BadMu'));
+    error('stats:vmmdistribution:vmmrnd:BadMu');
 elseif ~ismatrix(kappa)
-    error(message('stats:vmmdistribution:vmmrnd:BadKappa'));
+    error('stats:vmmdistribution:vmmrnd:BadKappa');
 elseif ~isvector(lambda)
-    error(message('stats:vmmdistribution:vmmrnd:BadLambda'));
+    error('stats:vmmdistribution:vmmrnd:BadLambda');
 end
 
 [K,d] = size(mu);
 
 if size(kappa,1) ~= K || size(kappa,2) ~= d
-    error(message('stats:vmmdistribution:vmmrnd:MuConcenSizeMismatch'));
+    error('stats:vmmdistribution:vmmrnd:MuConcenSizeMismatch');
 elseif length(lambda) ~= K
-    error(message('stats:vmmdistribution:vmmrnd:MuCorSizeMismatch'));
+    error('stats:vmmdistribution:vmmrnd:MuCorSizeMismatch');
 end
 
 if nargin < 4 || isempty(p)
     p = repmat(1/K,[1,K]);          % Default equal component mixing
 elseif ~isvector(p)
-    error(message('stats:vmmdistribution:vmmrnd:BadP'));
+    error('stats:vmmdistribution:vmmrnd:BadP');
 elseif length(p) ~= K
-    error(message('stats:vmmdistribution:vmmrnd:MuPSizeMismatch'));
+    error('stats:vmmdistribution:vmmrnd:MuPSizeMismatch');
 elseif any(p < 0 | p > 1)
-    error(message('stats:vmmdistribution:vmmrnd:InvalidP'));
+    error('stats:vmmdistribution:vmmrnd:InvalidP');
 end
 
 if nargin < 5 || isempty(type)
     type = 1;                       % Sine Model
 elseif isnumeric(type) || ~ischar(type)
-    error(message('stats:vmmdistribution:vmmrnd:InvalidType'));
+    error('stats:vmmdistribution:vmmrnd:InvalidType');
 end
 
 ModelNames = {'Sine','Cosine'};
@@ -68,7 +68,7 @@ CorType = find(strncmpi(type,ModelNames,length(type)));
 if nargin < 6 || isempty(n)
     n = 1;
 elseif ~isnumeric(n) || ~isscalar(n) || n <= 0 || n ~= round(n)
-    error(message('stats:vmmdistribution:vmmrnd:BadN'));
+    error('stats:vmmdistribution:vmmrnd:BadN');
 end
 
 %% Randomly pick from the components

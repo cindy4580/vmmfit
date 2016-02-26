@@ -150,27 +150,27 @@ methods
         end
         % Check Input types
         if nargin < 3
-            error(message('stats:vmmdistribution:TooFewInputs'));
+            error('stats:vmmdistribution:TooFewInputs');
         end
         if ~ismatrix(Mu) || ~isnumeric(Mu)
-            error(message('stats:vmmdistribution:BadMu'));
+            error('stats:vmmdistribution:BadMu');
         elseif ~ismatrix(Kappa) || ~isnumeric(Kappa)
-            error(message('stats:vmmdistribution:BadKappa'));
+            error('stats:vmmdistribution:BadKappa');
         elseif ~isvector(R) || ~isnumeric(R)
-            error(message('stats:vmmdistribution:BadLambda'));
+            error('stats:vmmdistribution:BadLambda');
         end
         % Check Mu/Kappa/Lambda 
         [k1,d1] = size(Mu); 
         [k2,d2] = size(Kappa);
         k = length(R);
         if d2 ~= 2 || d1 ~= 2 || k2 ~= k1
-            error(message('stats:vmmdistribution:MisshapedMuKappa'));
+            error('stats:vmmdistribution:MisshapedMuKappa');
         elseif k ~= k1
-            error(message('stats:vmmdistribution:MisshapedLambda'));
+            error('stats:vmmdistribution:MisshapedLambda');
         elseif sum(sum(Mu < -pi)) ~= 0 || sum(sum(Mu > pi)) ~= 0
-            error(message('stats:vmmdistribution:WrongMuRange'));
+            error('stats:vmmdistribution:WrongMuRange');
         elseif sum(sum(Kappa < 0)) ~= 0
-            error(message('stats:vmmdistribution:NegativeKappa'));
+            error('stats:vmmdistribution:NegativeKappa');
         elseif nargin < 4 
             P = ones(k1,1);
         end
@@ -183,9 +183,9 @@ methods
             obj.CorType = varargin{2};
         end
         if ~isvector(P) || length(P) ~= k
-            error(message('stats:vmmdistribution:MisshapedP'));
+            error('stats:vmmdistribution:MisshapedP');
         elseif any(P <= 0)
-            error(message('stats:vmmdistribution:InvalidP'));
+            error('stats:vmmdistribution:InvalidP');
         elseif size(P,2) ~= 1
             P = P';         % make it a column vector
         end
@@ -214,5 +214,5 @@ end % classdef
 function throwUndefinedError()
 st = dbstack; 
 name = regexp(st(2).name,'\.','split');
-error(message('stats:vmmdistribution:UndefinedFunction', name{2}, mfilename));
+error('stats:vmmdistribution:UndefinedFunction', name{2}, mfilename);
 end
