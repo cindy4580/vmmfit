@@ -28,7 +28,7 @@ function [idx,NlogL,post,logpdf,CircD] = cluster(X,obj)
 
 % Check for valid input
 if nargin ~= 2
-    error('stats:vmmdistribution:cluster:TooFewInputs');
+    error('TooFewInputs');
 end
 checkdata(X,obj);
 
@@ -36,7 +36,7 @@ checkdata(X,obj);
 wasnan=any(isnan(X),2);
 hadNaNs=any(wasnan);
 if hadNaNs
-    warning('stats:vmmdistribution:cluster:MissingData');
+    warning('MissingData');
     X = X( ~ wasnan,:);
 end
 

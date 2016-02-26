@@ -8,33 +8,33 @@ function obj = fit(X,k,varargin)
 
 % Check inputs
 if nargin < 2
-    error('stats:vmmdistribution:TooFewInputs');
+    error('TooFewInputs');
 end 
 
 checkdata(X); % X is matrix, dimensions match and in radians
 
 if ~isscalar(k) || ~isnumeric(k) || ~isfinite(k) || k < 1 || k ~= round(k)
-    error('stats:vmmdistribution:BadK');
+    error('BadK');
 end
 
 % Remove NaNs from X
 wasnan = any(isnan(X),2);
 hadNaNs = any(wasnan);
 if hadNaNs
-    warning('stats:vmmdistribution:MissingData');
+    warning('MissingData');
     X = X(~wasnan,:);
 end
 
 % Dimension check 
 [n, d] = size(X);
 if d ~= 2
-    error('stats:vmmdistribution:2D-DataOnly');
+    error('2D-DataOnly');
 end
 if n <= d
-    error('stats:vmmdistribution:TooFewPoints');
+    error('TooFewPoints');
 end
 if n <= k
-    error('stats:vmmdistribution:TooManyClusters');
+    error('TooManyClusters');
 end
 
 varX = var(X);
@@ -52,18 +52,18 @@ dftopt = statset('TolFun',1e-6,'MaxIter',100,'Display','off');
 options = statset(dftopt,options);
 
 if ~isnumeric(reps) || ~isscalar(reps) || round(reps) ~= reps || reps < 1
-    error('stats:vmmdistribution:BadReps');
+    error('BadReps');
 end
 
 if ischar(Cortype)
     covNames = {'Sine','Cosine'};
     i = find(strncmpi(Cortype,covNames,length(Cortype)));
     if isempty(i)
-        error('stats:vmmdistribution:UnknownCortype', Cortype);
+        error('UnknownCortype', Cortype);
     end
     Cortype = i;
 else
-    error('stats:vmmdistribution:InvalidCortype');
+    error('InvalidCortype');
 end
 
 options.Display = find(strncmpi(options.Display,{'off','notify','final',...

@@ -14,7 +14,7 @@ function y = pdf(X,obj,num)
 
 % Check for valid input
 if nargin ~= 3
-    error('stats:vmmdistribution:pdf:TooFewInputs');
+    error('TooFewInputs');
 end
 checkdata(X,obj);
 

@@ -7,17 +7,17 @@ function checkdata(X,obj)
 %   the OBJ.NDimensions
 
 if ~ismatrix(X) || ~isnumeric(X)
-    error('stats:vmmdistribution:RequiresMatrixData');
+    error('RequiresMatrixData');
 end
 
 if any(X(:) > pi) || any(X(:) < -pi)
-    error('stats:vmmdistribution:RequireRadianData');
+    error('RequireRadianData');
 end
 
 if nargin > 1
     [~, d] = size(X);
     if d ~= obj.Ndimensions
-        error('stats:vmmdistribution: XSizeMismatch', obj.NDimensions);
+        error('XSize Mismatch with %s', obj.NDimensions);
     end
 end % If obj is an input
 

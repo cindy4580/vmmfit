@@ -98,27 +98,27 @@ if isstruct(start)
     initPara = checkInitParam(start,k,d);
     start = 'Parameter';
     if reps ~= 1
-        error('stats:vmmdistribution:ConflictReps');
+        error('ConflictReps');
     end
 elseif isvector(start) && isnumeric(start)
     if length(start) ~= n
-        error('stats:vmmdistribution:MisshapedInitIdx');
+        error('MisshapedInitIdx');
     end
     if ~all(ismember(start, 1:k) )  || ~all(ismember(1:k,start)) % Index
-        error('stats:vmmdistribution:WrongInitIdx');
+        error('WrongInitIdx');
     end
     initIdx = start;
     start   = 'Partition';
     if reps ~=1
-        error('stats:vmmdistribution:ConflictReps');
+        error('ConflictReps');
     end
 elseif ischar(start)
     if ~strncmpi(start,'RandSample',length(start))
-        error('stats:vmmdistribution:BadStart');
+        error('BadStart');
     end
     start = 'RandSample';
 else
-    error('stats:vmmdistribution:BadStart');    
+    error('BadStart');    
 end % Start check
 
 %% Initialization
@@ -291,9 +291,9 @@ function initParam = checkInitParam(initParam,k,d)
 % Check for mixing weights
 if isfield(initParam, 'Pcomponents') && ~isempty(initParam.Pcomponents)
     if ~isvector(initParam.Pcomponents) || length(initParam.Pcomponents)~=k
-        error('stats:vmmdistribution:MisshapedInitP');
+        error('MisshapedInitP');
     elseif any(initParam.Pcomponents <= 0)
-        error('stats:vmmdistribution:InvalidP');
+        error('InvalidP');
     elseif size(initParam.Pcomponents,2) ~=1
         initParam.Pcomponents = initParam.Pcomponents';
     end
@@ -305,34 +305,34 @@ initParam.Pcomponents = initParam.Pcomponents/sum(initParam.Pcomponents);
 % Check for mean directions
 if isfield(initParam,'Mu') && ~isempty(initParam.Mu)
     if ~isequal(size(initParam.Mu),[k,d])
-        error('stats:vmmdistribution:MisshapedInitMu');
+        error('MisshapedInitMu');
     elseif any(initParam.Mu(:) > pi) || any(initParam.Mu(:) < -pi)
-        error('stats:vmmdistribution:BeyondBoundaryInitMu');
+        error('BeyondBoundaryInitMu');
     end
 else
-    error('stats:vmmdistribution:MissingInitMu');
+    error('MissingInitMu');
 end
 
 % Check for concentration parameters
 if isfield(initParam,'Kappa') && ~isempty(initParam.Kappa)
     if ~isequal(size(initParam.Kappa),[k,d])
-        error('stats:vmmdistribution:MisshapedInitKappa');
+        error('MisshapedInitKappa');
     elseif any(initParam.Kappa(:) <= 0)
-        error('stats:vmmdistribution:InvalidKappa');
+        error('InvalidKappa');
     end
 else
-    error('stats:vmmdistribution:MissingInitKappa');
+    error('MissingInitKappa');
 end
 
 % Check for relation parameters
 if isfield(initParam,'Lambda') && ~isempty(initParam.Lambda)
     if ~isvector(initParam.Lambda) || length(initParam.Lambda) ~= k
-        error('stats:vmmdistribution:MisshapedInitL');
+        error('MisshapedInitL');
     elseif size(initParam.Lambda,2) ~=1
         initParam.Lambda = initParam.Lambda';
     end
 else
-    error('stats:vmmdistribution:MissingInitLambda');
+    error('MissingInitLambda');
 end
 
 % Check for unimodal von Mises distribution
@@ -340,7 +340,7 @@ for i = 1 : k
     P = diag(initParam.Kappa(i,:)) - initParam.Lambda(i) * flip(eye(2));
     [~, num] = cholcov(P);
     if num ~= 0
-        error('stats:vmmdistribution:BadInitKappaWithLambda');
+        error('BadInitKappaWithLambda');
     end
 end % Unimode check
 

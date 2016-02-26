@@ -15,10 +15,10 @@ function k = kappa( alpha )
 
 % Input format check
 if nargin >2 
-    error('stats:vmmdistribution:TooManyInputs');
+    error('TooManyInputs');
 end
 if size(alpha,2) ~= 2
-    error('stats:vmmdistribution:2DInputOnly');
+    error('2DInputOnly');
 end
 
 % Initialization

@@ -29,37 +29,37 @@ function [y, compIdx] = vmmrnd(mu,kappa,lambda,p,type,n)
 
 %% Check Inputs
 if nargin < 3 || isempty(mu) || isempty(kappa) || isempty(lambda)
-    error('stats:vmmdistribution:vmmrnd:TooFewInputs');
+    error('TooFewInputs');
 elseif ~ismatrix(mu)
-    error('stats:vmmdistribution:vmmrnd:BadMu');
+    error('BadMu');
 elseif ~ismatrix(kappa)
-    error('stats:vmmdistribution:vmmrnd:BadKappa');
+    error('BadKappa');
 elseif ~isvector(lambda)
-    error('stats:vmmdistribution:vmmrnd:BadLambda');
+    error('BadLambda');
 end
 
 [K,d] = size(mu);
 
 if size(kappa,1) ~= K || size(kappa,2) ~= d
-    error('stats:vmmdistribution:vmmrnd:MuConcenSizeMismatch');
+    error('MuConcenSizeMismatch');
 elseif length(lambda) ~= K
-    error('stats:vmmdistribution:vmmrnd:MuCorSizeMismatch');
+    error('MuCorSizeMismatch');
 end
 
 if nargin < 4 || isempty(p)
     p = repmat(1/K,[1,K]);          % Default equal component mixing
 elseif ~isvector(p)
-    error('stats:vmmdistribution:vmmrnd:BadP');
+    error('BadP');
 elseif length(p) ~= K
-    error('stats:vmmdistribution:vmmrnd:MuPSizeMismatch');
+    error('MuPSizeMismatch');
 elseif any(p < 0 | p > 1)
-    error('stats:vmmdistribution:vmmrnd:InvalidP');
+    error('InvalidP');
 end
 
 if nargin < 5 || isempty(type)
     type = 1;                       % Sine Model
 elseif isnumeric(type) || ~ischar(type)
-    error('stats:vmmdistribution:vmmrnd:InvalidType');
+    error('InvalidType');
 end
 
 ModelNames = {'Sine','Cosine'};
@@ -68,7 +68,7 @@ CorType = find(strncmpi(type,ModelNames,length(type)));
 if nargin < 6 || isempty(n)
     n = 1;
 elseif ~isnumeric(n) || ~isscalar(n) || n <= 0 || n ~= round(n)
-    error('stats:vmmdistribution:vmmrnd:BadN');
+    error('BadN');
 end
 
 %% Randomly pick from the components

@@ -150,27 +150,27 @@ methods
         end
         % Check Input types
         if nargin < 3
-            error('stats:vmmdistribution:TooFewInputs');
+            error('TooFewInputs');
         end
         if ~ismatrix(Mu) || ~isnumeric(Mu)
-            error('stats:vmmdistribution:BadMu');
+            error('BadMu');
         elseif ~ismatrix(Kappa) || ~isnumeric(Kappa)
-            error('stats:vmmdistribution:BadKappa');
+            error('BadKappa');
         elseif ~isvector(R) || ~isnumeric(R)
-            error('stats:vmmdistribution:BadLambda');
+            error('BadLambda');
         end
         % Check Mu/Kappa/Lambda 
         [k1,d1] = size(Mu); 
         [k2,d2] = size(Kappa);
         k = length(R);
         if d2 ~= 2 || d1 ~= 2 || k2 ~= k1
-            error('stats:vmmdistribution:MisshapedMuKappa');
+            error('MisshapedMuKappa');
         elseif k ~= k1
-            error('stats:vmmdistribution:MisshapedLambda');
+            error('MisshapedLambda');
         elseif sum(sum(Mu < -pi)) ~= 0 || sum(sum(Mu > pi)) ~= 0
-            error('stats:vmmdistribution:WrongMuRange');
+            error('WrongMuRange');
         elseif sum(sum(Kappa < 0)) ~= 0
-            error('stats:vmmdistribution:NegativeKappa');
+            error('NegativeKappa');
         elseif nargin < 4 
             P = ones(k1,1);
         end
@@ -183,9 +183,9 @@ methods
             obj.CorType = varargin{2};
         end
         if ~isvector(P) || length(P) ~= k
-            error('stats:vmmdistribution:MisshapedP');
+            error('MisshapedP');
         elseif any(P <= 0)
-            error('stats:vmmdistribution:InvalidP');
+            error('InvalidP');
         elseif size(P,2) ~= 1
             P = P';         % make it a column vector
         end
