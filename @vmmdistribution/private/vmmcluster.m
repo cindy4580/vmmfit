@@ -170,7 +170,7 @@ for t = 1 : reps
         else
             illCondCnt = illCondCnt + 1;
             warning('stats:vmmdistribution:NotUnimodal', t, k, ...
-                ME.message( strfind( ME.message, sprintf( '\n' ) ) + 1:end )));
+                ME.message(strfind(ME.message, sprintf( '\n' ) ) + 1:end));
             if illCondCnt == reps
                 m = 'stats:vmmdistribution:NotUnimodalAllReps';
                 throwAsCaller(MException(m.Identifier,'%s',getString(m)));

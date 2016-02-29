@@ -205,8 +205,8 @@ methods(Static = true, Hidden=true)
 end % method II
 
 methods(Static = true, Hidden=true)
-    function [] = empty(varargin)                   % improvement over a = empty(varargin)
-        throwUndefinedError();                      % ????
+    function [] = empty(varargin)    % improvement over a = empty(varargin)
+        throwUndefinedError();       % ????
     end % function
 end % method III
 end % classdef
