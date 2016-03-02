@@ -59,7 +59,7 @@ if ischar(Cortype)
     covNames = {'Sine','Cosine'};
     i = find(strncmpi(Cortype,covNames,length(Cortype)));
     if isempty(i)
-        error('UnknownCortype', Cortype);
+        error('UnknownCortype: %s', Cortype);
     end
     Cortype = i;
 else

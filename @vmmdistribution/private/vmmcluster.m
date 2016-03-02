@@ -184,18 +184,18 @@ end % Vmmcluster function
 %% Function Definitions
 function [S,ll,optimInfo] = vmmclusterlearn(X,k,initPara,CorType,options)
 % Initialization
+optimInfo.Converged = false;
+optimInfo.Iters = 0;
 num     = 100;                  % Cutoff for inifinite summation
 reg     = 0;                    % Non-negative number to keep unimodality
 S       = initPara;
 ll_old  = -inf;
-optimInfo.Converged = false;
-optimInfo.Iters = 0;
+
 csX = cos(X);
 sX  = sin(X);
 
-
 dispfmt = '%6d\t%12g\n';
-opt     = optimset('MaxIter',1e3,'FunValCheck','on');   %??????
+opt     = optimset('MaxIter',1e3,'FunValCheck','on');   % fzero options
 
 if options.Display > 2 % 'iter'
    fprintf('iter\t    log-likelihood\n');
@@ -234,33 +234,32 @@ for iter = 1 : options.MaxIter
 
     if CorType          % Sine Model
         for j = 1 : k
+            
             % Mu
             Xcentered = bsxfun(@minus,X, S.Mu(j,:));
-            sXcen     = sin(Xcentered);
-            sXcenCos  = sXcen.*flip(csX,2);
-            sXcenSin  = sXcen.*flip(sX,2);
+            sXcenCos  = sin(Xcentered) .* fliplr(csX);
+            sXcenSin  = sin(Xcentered) .* fliplr(sX);
             KsX       = bsxfun(@times,S.Kappa(j,:),sX);
             KcsX      = bsxfun(@times,S.Kappa(j,:),csX);
-            Uppr      = bsxfun(@minus,KsX,S.Lambda(j)*flip(sXcenCos,2));
-            Down      = bsxfun(@plus,KcsX,S.Lambda(j)*flip(sXcenSin,2));
-            S.Mu(j,:) = atan2(sum(bsxfun(@times,post(:,j),Uppr)),...
-                              sum(bsxfun(@times,post(:,j),Down)));
+            Numer     = bsxfun(@minus,KsX,S.Lambda(j)*fliplr(sXcenCos));
+            Denom     = bsxfun(@plus,KcsX,S.Lambda(j)*fliplr(sXcenSin));
+            % atan2: [-pi, pi]
+            S.Mu(j,:) = atan2(sum(bsxfun(@times,post(:,j),Numer)),...       
+                              sum(bsxfun(@times,post(:,j),Denom)));
+                          
             % Kappa & Lambda              
-            Xcentered = bsxfun(@minus,X, S.Mu(j,:)); % Use updated Mu
-            csXcen    = cos(Xcentered);
-            sXcen     = sin(Xcentered);
-            E         = sum(bsxfun(@times,csXcen,post(:,j)));
-            F         = sXcen(:,1).*sXcen(:,2);
-            Known     = [ S.Kappa(j,2) S.Lambda(j);
-                          S.Kappa(j,1) S.Lambda(j);
-                          S.Kappa(j,:)];
-            Coef      = [E(1)           S.Pcomponents(j);
-                         E(2)           S.Pcomponents(j);
-                         F' * post(:,j) S.Pcomponents(j)];
-            [g1,g2,g3]= normsum(Known, Coef, CorType, num);
+            Xcen = bsxfun(@minus,X, S.Mu(j,:));         % Use updated Mu
+            E    = sum(bsxfun(@times,cos(Xcen),post(:,j)));
+            F    = prod(sin(Xcen),2)' * post(:,j) ;
+            Set  = [flip(S.Kappa(j,:)); repmat(S.Lambda(j),1,2)]';
+            Coef = [E' repmat(S.Pcomponents(j),2,1)];
+            
+            [g1,g2,~] = normsum(Set, Coef, CorType, num);
             S.Kappa(j,1) = fzero(g1,S.Kappa(j,1),opt);
             S.Kappa(j,2) = fzero(g2,S.Kappa(j,2),opt);
-            S.Lambda(j)  = fzero(g3,S.Lambda(j),opt);
+            
+            [~,~,gl] = normsum(S.Kappa(j,:),[F S.Pcomponents(j)], CorType,num);
+            S.Lambda(j)  = fzero(gl,S.Lambda(j),opt);
             
             % Correction for unimodality
             D = S.Kappa(j,1) * S.Kappa(j,2) - S.Lambda(j)^2;

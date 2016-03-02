@@ -24,7 +24,7 @@ function [idx,NlogL,post,logpdf,CircD] = cluster(X,obj)
 %   See also FITVMMDIST, VMMDISTRIBUTION
 %   
 %   Reference: MATLAB MACHINE LEARNING TOOLBOX
-%   Copyright: Xindi Li xindi.li@stonybrook.edu
+%   Copyright: Xindi Li (xindi.li@stonybrook.edu)
 
 % Check for valid input
 if nargin ~= 2
