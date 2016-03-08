@@ -194,9 +194,10 @@ ll_old  = -inf;
 csX = cos(X);
 sX  = sin(X);
 
-dispfmt = '%6d\t%12g\n';
-opt     = optimset('MaxIter',1e3,'FunValCheck','on');   % fzero options
+% fzero/fsolve options
+opt     = optimset('MaxIter',1e3,'FunValCheck','on','Display','none');
 
+dispfmt = '%6d\t%12g\n';
 if options.Display > 2 % 'iter'
    fprintf('iter\t    log-likelihood\n');
 end
@@ -259,7 +260,7 @@ for iter = 1 : options.MaxIter
             S.Kappa(j,2) = fzero(g2,S.Kappa(j,2),opt);
             
             [~,~,gl] = normsum(S.Kappa(j,:),[F S.Pcomponents(j)], CorType,num);
-            S.Lambda(j)  = fzero(gl,S.Lambda(j),opt);
+            S.Lambda(j)  = fsolve(gl,S.Lambda(j),opt);
             
             % Correction for unimodality
             D = S.Kappa(j,1) * S.Kappa(j,2) - S.Lambda(j)^2;

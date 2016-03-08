@@ -15,17 +15,23 @@ if size(X) ~= size(Y)
 end
 
 if Cortype
-  
-    f  = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m,x)*besseli(m,y)/(4*x*y)^m,m,0,cutoff);
+    
+    f  = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m,x)*besseli(m,y)/...
+            ((4*x*y)^m * exp(x) * exp(y)),m,0,cutoff);
+        
     if size(X,1) ~= size(X,2)           % Input for updating lambda only 
-        fl = symsum(nchoosek(2*m,m)*(2*m)*z^(2*m-1)*besseli(m,x)*besseli(m,y)/(4*x*y)^m,m,0,cutoff);
-        gl = matlabFunction(vpa(subs(fl/f- Y(1)/Y(2),[x y],X)));
+        
+        fl = symsum(nchoosek(2*m,m)*(2*m)*z^(2*m-1)*besseli(m,x)*besseli(m,y)/ ...
+            ((4*x*y)^m* exp(x) * exp(y)),m,0,cutoff);
+        gl = matlabFunction(vpa(subs(fl*Y(2) - Y(1) * f,[x y],X)));
         g1 = 0; g2 = 0;
-    else
-        fk = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m+1,x)*besseli(m,y)/(4*x*y)^m,m,0,cutoff);
-        g1  = matlabFunction(vpa(subs(fk/f - Y(1,1)/Y(1,2), [y z], X(1,:))));
-        g2  = matlabFunction(vpa(subs(fk/f - Y(2,1)/Y(2,2), [y z], X(2,:))));
-        gl  = 0;
+    else                                % Updating Kappa in pairs
+        
+        fk = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m+1,x)*besseli(m,y)/...
+            ((4*x*y)^m *exp(x) * exp(y)),m,0,cutoff);
+        g1 = matlabFunction(vpa(subs(fk/f - Y(1,1)/Y(1,2), [y z], X(1,:))));
+        g2 = matlabFunction(vpa(subs(fk/f - Y(2,1)/Y(2,2), [y z], X(2,:))));
+        gl = 0;
     end
     
 else
