@@ -39,15 +39,11 @@ if hadNaNs
     warning('MissingData');
     X = X( ~ wasnan,:);
 end
-
-% Model Selection
-ModelNames = {'Sine','Cosine'};
-CorType = find(strncmpi(obj.CorType,ModelNames,length(obj.CorType)));
 cutoff  = 100;
 
 % Calculation
 [log_lh,CircD]=wdensity(X,obj.Mu,obj.Kappa,obj.Lambda,obj.Pcomponents, ...
-    CorType,cutoff);
+    obj.CorType,cutoff);
 [ll, post,logpdf] = estep(log_lh);
 [~,idx] = max(post,[],2);
 NlogL = -ll;

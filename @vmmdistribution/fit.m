@@ -84,6 +84,7 @@ try
     obj.Converged = optimInfo.Converged;
     obj.Iters = optimInfo.Iters;
     obj.NlogL = NlogL;
+    obj.CorType = Cortype;
     
     nParam  = 3*k*obj.Ndimensions - 1;
     obj.BIC = 2*NlogL + nParam*log(n);
