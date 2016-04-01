@@ -256,8 +256,10 @@ for iter = 1 : options.MaxIter
             
             [g1,g2,~] = normsum(Set, Coef, CorType, num);
             S.Kappa(j,1) = fzero(g1,S.Kappa(j,1),opt);
+            %S.Kappa(j,1) = fzero(@(x)g1(x,c,cutoff),x0,opt)
             S.Kappa(j,2) = fzero(g2,S.Kappa(j,2),opt);
-            
+            % c = 0.1; cutoff = 100;
+            %S.Kappa(j,2) = fzero(@(x)g2(x,c,cutoff),x0,opt)
             [~,~,gl] = normsum(S.Kappa(j,:),[F S.Pcomponents(j)], CorType,num);
             S.Lambda(j)  = fzero(gl,S.Lambda(j),opt);
             
