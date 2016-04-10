@@ -93,6 +93,7 @@ function [S,NlogL,Info] = vmmcluster(X,k,start,reps,Cortype,options)
 %               MATLAB MACHINE LEARNING TOOLBOX
 %
 %   CopyRight : Xindi Li (xindi.li@stonybrook.edu)
+
 [n,d] = size(X);
 if isstruct(start)
     initPara = checkInitParam(start,k,d);
@@ -138,7 +139,7 @@ for t = 1 : reps
     
     if (options.Display > 1) && reps > 1                    % Final or iter
         fprintf('\n%s\n',getString(message( ...
-            'stats:vmmdistribution:vmcluster_Repetition', t)));
+            'stats:vmmdistribution:vmmcluster_Repetition', t)));
     end
     
     % Run von Mises mixture clustering **once**
@@ -148,14 +149,19 @@ for t = 1 : reps
         
         if ~optimInfo0.Converged
             if reps == 1
-                warning('stats:vmmdistribution:FailedToConverge',options.MaxIter,k);
+                warning('stats:vmmdistribution:FailedToConverge',...
+                    'need more than %d iterations for %dth cluster',...
+                    options.MaxIter,k);
             else
-                warning('stats:vmmdistribution:FailedToConvergeReps',options.MaxIter,t,k);
+                warning('stats:vmmdistribution:FailedToConvergeReps',...
+                    'need more than %d iterations for the %dth cluster',...
+                    options.MaxIter,k);
             end
         end % Check convergency
         
         if options.Display > 1 % 'final' or 'iter'
-           fprintf('%d iterations, log-likelihood = %g\n',optimInfo0.Iters,ll0); 
+           fprintf('%d iterations, log-likelihood = %g\n',...
+               optimInfo0.Iters,ll0); 
         end % Check display
         
         if ll0 > max_ll    % keep the best one
@@ -164,8 +170,10 @@ for t = 1 : reps
             Info = optimInfo0;
         end % Check likelihood
     catch ME
-        if reps == 1 || (~isequal(ME.identifier,'stats:vmmdistribution:NotUnimodal') && ...
-                         ~isequal(ME.identifier,'stats:vmmdistribution:NotUnimodalIter'))
+        if reps == 1 || (~isequal(ME.identifier,...
+                'stats:vmmdistribution:NotUnimodal') && ...
+                         ~isequal(ME.identifier,...
+                         'stats:vmmdistribution:NotUnimodalIter'))
             rethrow(ME);
         else
             illCondCnt = illCondCnt + 1;
@@ -180,14 +188,15 @@ for t = 1 : reps
 end % Iteration
 NlogL = -max_ll;      
 end % Vmmcluster function
-%--------------------------------------------------------------------------
+
+
 %% Function Definitions
 function [S,ll,optimInfo] = vmmclusterlearn(X,k,initPara,CorType,options)
 % Initialization
 optimInfo.Converged = false;
 optimInfo.Iters = 0;
-num     = 100;                  % Cutoff for inifinite summation
 reg     = 0;                    % Non-negative number to keep unimodality
+numw    = 100;                  % Inifite summation cutoff for NormD
 S       = initPara;
 ll_old  = -inf;
 
@@ -196,17 +205,25 @@ sX  = sin(X);
 
 % fzero/fsolve options
 opt     = optimset('MaxIter',1e3,'FunValCheck','on','Display','none');
-
 dispfmt = '%6d\t%12g\n';
+
 if options.Display > 2 % 'iter'
    fprintf('iter\t    log-likelihood\n');
 end
 
 for iter = 1 : options.MaxIter
+    % Self-adaptive cutoff for inifinite summation in Lambda update
+    % Cutoff for inifinite summation is fixed at 20 to calculate Kappa
+    if abs(S.Lambda) < 10
+        num = 25;
+    elseif abs(S.Lambda) < 100
+        num = 80;
+    end
+
     % E-step : compute the posteriors  
     try
         log_lh = wdensity(X, S.Mu, S.Kappa, S.Lambda, S.Pcomponents,...
-                            CorType,num);       % Seperate function file
+                            CorType,numw);      % Seperate function file
         [ll,post] = estep(log_lh);              % Seperate function file
     catch ME 
         if ~isequal(ME.identifier,'stats:vmmdistribution:NotUnimodal')
@@ -248,19 +265,37 @@ for iter = 1 : options.MaxIter
             S.Mu(j,:) = atan2(sum(bsxfun(@times,post(:,j),Numer)),...       
                               sum(bsxfun(@times,post(:,j),Denom)));
                           
-            % Kappa & Lambda              
-            Xcen = bsxfun(@minus,X, S.Mu(j,:));         % Use updated Mu
-            E    = sum(bsxfun(@times,cos(Xcen),post(:,j)));
-            F    = prod(sin(Xcen),2)' * post(:,j) ;
-            Set  = [flip(S.Kappa(j,:)); repmat(S.Lambda(j),1,2)]';
+            % Kappa           
+            Xcen = bsxfun(@minus,X, S.Mu(j,:));         % Use updated Mu 
+            E 	 = sum(bsxfun(@times,cos(Xcen),post(:,j)));
             Coef = [E' repmat(S.Pcomponents(j),2,1)];
+            %Set  = [flip(S.Kappa(j,:)); repmat(S.Lambda(j),1,2)]';
             
-            [g1,g2,~] = normsum(Set, Coef, CorType, num);
-            S.Kappa(j,1) = fzero(g1,S.Kappa(j,1),opt);
-            S.Kappa(j,2) = fzero(g2,S.Kappa(j,2),opt);
+%           %Symbolic box method
+% 			[g1,g2,~] = normsum(Set, Coef, CorType, 20);
+%           S.Kappa(j,1) = fzero(g1,S.Kappa(j,1),opt);
+%           S.Kappa(j,2) = fzero(g2,S.Kappa(j,2),opt);
             
-            [~,~,gl] = normsum(S.Kappa(j,:),[F S.Pcomponents(j)], CorType,num);
-            S.Lambda(j)  = fsolve(gl,S.Lambda(j),opt);
+            % General "for-loop" method
+            S.Kappa(j,1) = fzero(@(x)ka(x,[S.Kappa(j,2) S.Lambda(j)],...
+                Coef(1,:),CorType,20),S.Kappa(j,1),opt);
+            S.Kappa(j,2) = fzero(@(x)ka(x,[S.Kappa(j,1) S.Lambda(j)],...
+               Coef(2,:),CorType,20),S.Kappa(j,2),opt);
+           
+           
+            % Lambda        
+            F = prod(sin(Xcen),2)' * post(:,j);
+            if num < 28
+                % nchoose(56,28) is the critical value for warning
+                S.Lambda(j) = fzero(@(z)lam(z,S.Kappa(j,:),...
+                    F/S.Pcomponents(j),CorType,num),S.Lambda(j),opt);
+            else
+                % Call symbolic toolbox instead
+                [~,~,gl] = normsum(S.Kappa(j,:),[F S.Pcomponents(j)],...
+                    CorType,num);
+                S.Lambda(j) = fsolve(gl,S.Lambda(j),opt);
+            end
+            
             
             % Correction for unimodality
             D = S.Kappa(j,1) * S.Kappa(j,2) - S.Lambda(j)^2;
@@ -276,7 +311,7 @@ for iter = 1 : options.MaxIter
         end % K components
     else                % Cosine Model
         for j = 1 : k
-            
+            %%%%%%%% Waiting %%%%%%%%%%
         end % K components
     end % CorType
     
@@ -381,3 +416,75 @@ initPara.Lambda = sqrt(initPara.Kappa(:,1) .* initPara.Kappa(:,2)) - ...
     
 end % function partInitParam
 
+%% Functions for updating kappa and lambda
+% Denominator function for Kappa
+function d = fdk(x,P,Cortype,cutoff)
+d = 0;
+if Cortype
+% Sine model updating rule    
+    for m = 0 : cutoff
+        d = d + (nchoosek(2*m,m)*P(2)^(2*m)*besseli(m,x)*...
+            besseli(m,P(1)))/((4*x*P(1))^m * exp(x) * exp(P(1)));
+    end
+else 
+% Cosine model updating rule    
+    for m = 1 :cutoff
+        d = d + 2 * besseli(m,x) * besseli(m,P(1)) * besseli(m,P(2));
+    end
+    d = d + besseli(0,x) * besseli(0,P(1)) * besseli(0,P(2));
+end % Cortype
+end % Function fdk
+
+% Kappa numerator function
+function res = ka(x,P,Y,Cortype,cutoff)
+res = 0;
+if Cortype
+% Sine model updating rule
+    for m = 0 : cutoff
+        res = res + (nchoosek(2*m,m)*P(2)^(2*m)*besseli(m+1,x)*...
+            besseli(m,P(1)))/((4*x*P(1))^m * exp(x) * exp(P(1)));
+    end % Sum
+else
+% Cosine model updating rule
+    %%%%%%%%%%%%%%%%% Waiting %%%%%%%%%%%%%%%%%
+end % Cortype
+tem = fdk(x,P,Cortype,cutoff);
+res = res/tem - Y(1)/Y(2);
+end % Function ka
+
+% Denominator function for Lambda
+function res = fdl(z,P,Cortype,cutoff)
+res = 0;    
+if Cortype
+% Sine model updating rule    
+    for m = 0 : cutoff
+        res = res + (nchoosek(2*m,m)*z^(2*m)*besseli(m,P(1))*...
+            besseli(m,P(2)))/((4*P(2)*P(1))^m * exp(P(2))*exp(P(1)));
+    end
+else 
+% Cosine model updating rule    
+    for m = 0 :cutoff
+        res = res + besseli(m,z) * besseli(m,P(1)) * besseli(m,P(2));
+    end
+    res = res + besseli(0,z) * besseli(0,P(1)) * besseli(0,P(2));
+end % Cortype
+end % Function fdk
+
+% Lambda numerator function
+function res = lam(z,X,Y,Cortype,cutoff)
+res = 0;
+if Cortype
+% Sine model updating rule   
+    for m = 0 : cutoff
+        res = res + (nchoosek(2*m,m)*(2*m)*z^(2*m-1) * besseli(m,X(1)) *...
+            besseli(m,X(2)))/((4*X(1)*X(2))^m * exp(X(2))*exp(X(1))); 
+    end % Sum
+else
+% Cosine model updating rule
+    for m = 0 : cutoff
+            %%%%%%%%%%%%%%%%% Waiting %%%%%%%%%%%%%%%
+    end
+end % Cortype
+
+res = res/fdl(z,X,Cortype,cutoff) - Y;
+end % Function lam

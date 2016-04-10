@@ -21,7 +21,7 @@ end
 wasnan = any(isnan(X),2);
 hadNaNs = any(wasnan);
 if hadNaNs
-    warning('MissingData');
+    warning('DataWithNaNs');
     X = X(~wasnan,:);
 end
 

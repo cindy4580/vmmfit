@@ -15,18 +15,20 @@ if size(X) ~= size(Y)
 end
 
 if Cortype
-    
+	% Denominator function    
     f  = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m,x)*besseli(m,y)/...
             ((4*x*y)^m * exp(x) * exp(y)),m,0,cutoff);
-        
-    if size(X,1) ~= size(X,2)           % Input for updating lambda only 
-        
+
+    % Input for updating lambda only 
+    if size(X,1) ~= size(X,2)                   
         fl = symsum(nchoosek(2*m,m)*(2*m)*z^(2*m-1)*besseli(m,x)*besseli(m,y)/ ...
             ((4*x*y)^m* exp(x) * exp(y)),m,0,cutoff);
-        gl = matlabFunction(vpa(subs(fl*Y(2) - Y(1) * f,[x y],X)));
+        gl = matlabFunction(vpa(subs(fl*Y(2) - f*Y(1),[x y],X)));
+		%gl = matlabFunction(vpa(subs(fl/f - Y,[x y],X)));
         g1 = 0; g2 = 0;
-    else                                % Updating Kappa in pairs
-        
+
+	% Updating Kappa in pairs
+    else                                        
         fk = symsum(nchoosek(2*m,m)*z^(2*m)*besseli(m+1,x)*besseli(m,y)/...
             ((4*x*y)^m *exp(x) * exp(y)),m,0,cutoff);
         g1 = matlabFunction(vpa(subs(fk/f - Y(1,1)/Y(1,2), [y z], X(1,:))));
