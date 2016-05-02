@@ -196,7 +196,7 @@ function [S,ll,optimInfo] = vmmclusterlearn(X,k,initPara,CorType,options)
 optimInfo.Converged = false;
 optimInfo.Iters = 0;
 reg     = 0;                    % Non-negative number to keep unimodality
-numw    = 100;                  % Inifite summation cutoff for NormD
+err    = 1e-5;                  % Inifite summation cutoff for NormD
 S       = initPara;
 ll_old  = -inf;
 
@@ -223,7 +223,7 @@ for iter = 1 : options.MaxIter
     % E-step : compute the posteriors  
     try
         log_lh = wdensity(X, S.Mu, S.Kappa, S.Lambda, S.Pcomponents,...
-                            CorType,numw);      % Seperate function file
+                            CorType,err);      % Seperate function file
         [ll,post] = estep(log_lh);              % Seperate function file
     catch ME 
         if ~isequal(ME.identifier,'stats:vmmdistribution:NotUnimodal')
