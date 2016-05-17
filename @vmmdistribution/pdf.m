@@ -17,9 +17,9 @@ if nargin > 2
 end
 checkdata(X,obj);
 % Calculation
-num = 100;
+err = 1e-5;
 log_lh = wdensity(X,obj.Mu,obj.Kappa,obj.Lambda,obj.Pcomponents,...
-                    obj.CorType,num);
+                    obj.CorType,err);
 y      = sum(exp(log_lh),2);
 end
 
