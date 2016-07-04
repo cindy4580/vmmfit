@@ -89,6 +89,9 @@ try
     nParam  = 3*k*obj.Ndimensions - 1;
     obj.BIC = 2*NlogL + nParam*log(n);
     obj.AIC = 2*NlogL + 2*nParam;
+    
+    kbad    = sum(S.Pcomponents < 0.03);
+    obj.CIC = obj.AIC + 2*log(n) * kbad;
 
 catch ME
     rethrow(ME) ;

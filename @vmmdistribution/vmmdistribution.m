@@ -89,9 +89,12 @@ AIC = [];       % Akaike information criterion
 %   where NlogL is the value of the NLogL property, and N is the number of
 %   observations
 BIC = [];       % Bayes information criterion
+%   CIC : The user-defined information criterion value
+CIC = [];       % Cindy's information criterion
 %   Converged:   A logical value indicating whether the algorithm converged
 %   The Converged property is true if the fitting algorithm converged;
 %   false if the algorithm did not converge
+%
 Converged = [];     % Has the EM converged
 %   Iters: The number of iterations
 %   The Iters property is a integer indicating the The number of iterations
@@ -130,7 +133,8 @@ methods
     % default is equal proportions if P is not given
     % 
     % CorType indicates the correlation type of model used to build up a
-    % bivariate von Mises distribution for each component 
+    % bivariate von Mises distribution for each component. Sine model is 
+    % default 
     %
     % The inputs MU, KAPPA, R, P and CorType are stored in the Mu, Kappa,
     % Lambda and Pcomponents properties, respectively, of VMM
@@ -177,7 +181,7 @@ methods
         % Check P/Model
         if nargin < 5
             P = varargin{1};
-            obj.CorType = 'Cosine';      
+            obj.CorType = 'Sine';      
         elseif nargin < 6
             P = varargin{1};
             obj.CorType = varargin{2};

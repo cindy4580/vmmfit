@@ -372,7 +372,7 @@ end
 
 % Check for unimodal von Mises distribution
 for i = 1 : k
-    P = diag(initParam.Kappa(i,:)) - initParam.Lambda(i) * flip(eye(2));
+    P = diag(initParam.Kappa(i,:)) - initParam.Lambda(i) * fliplr(eye(2));
     [~, num] = cholcov(P);
     if num ~= 0
         error('BadInitKappaWithLambda');
