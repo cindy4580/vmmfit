@@ -1,7 +1,7 @@
 function vmm = fitvmmdist(X,k,varargin)
-% FITVMMDIST(X,K) fits a bivariate von Mises mixture distribution to data
-%   VMM = FITVMMDIST(X,K) fits a bivariate von Mises distribution with K
-%   components to the data in X. X is an N-by-2 matrix in radians [-pi,pi].
+% FITVMMDIST(X,K) fits a multivariate von Mises mixture distribution 
+%   VMM = FITVMMDIST(X,K) fits a multivariate von Mises distribution with K
+%   components to the data in X. X is an N-by-M matrix in radians [-pi,pi].
 %   Rows of X correspond to ovservations; columns correspond to variables.
 %   FIVMMDIST fits the model by maximum likelihood, using the
 %   Expectation-Maximization (EM) algorithm
@@ -37,28 +37,24 @@ function vmm = fitvmmdist(X,k,varargin)
 %                   * As a scalar structure S containing the initial 
 %                   parameter values in the following fields:
 %
-%                       S.Mu:           A K-by-2 matrix specifying the 
+%                       S.Mu:           A K-by-M matrix specifying the 
 %                                       initial mean direction in radians
 %                                       of each componet
 %
-%                       S.Kappa:        A K-by-2 matrix specifying the 
+%                       S.Kappa:        A K-by-M matrix specifying the 
 %                                       concentration matrix of each 
 %                                       component
 %                       S.Lambda:       A K-by-1 column vector containing
-%                                       correlation parameters
+%                                       correlation parameters in 2D case
+%                                       or A M-by-M-by-K array otherwise
 %
 %                       S.Pcomponents:  A K-by-1 vector specifying the 
 %                                       initial mixing proportions of each
 %                                       component.The default is uniform
 %
-%
-%       'Replica'   A positive integer giving the number of times to repeat
-%       the fit, each with a new set of initial parameters. VMMFIT is the 
-%       fit with the largest likelihood. The default number of replicates 
-%       is 1. A value larger than 1 requires the 'RandSample' Start method
-%
 %       'CorType'   Specifying two different models for bivariate von Mises
-%       distribution. The default is 'Sine'
+%       distribution. The default is 'Sine',and Cosine model is under
+%       further development
 %
 %       'Options'   Options structure for the iterative EM algorithm,as
 %       created by STATSET. The following STATSET parameters are used:
