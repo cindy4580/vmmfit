@@ -1,12 +1,12 @@
 function r = mvmrnd(mu, kappa, lambda, n)
 %MVMRND Generates random vectors from the multivariate sine von Mises 
-%distributions
-%   R = BVMRND(MU,KAPPA,LAMBDA,N) returns an N-by-M matrix R whose rows are
+%		distributions
+%   R = MVMRND(MU,KAPPA,LAMBDA,N) returns an N-by-M matrix R whose rows are
 %   random vectors drawn from the Sine Model Multivariate von Mises 
 %   Distribution with mean direction MU, concentration parameter KAPPA and 
-%   relation parameter Lambda. The angles lie between ±pi radians
+%   relation parameter Lambda. The angles lie between ±pi in radians
 %
-%   Input    :
+%   Input:
 %               Mu      -- 1-by-M Row vector 
 %               Kappa   -- 1-by-M Row vector
 %               Lambda  -- Scalar(Bivariate Case)
@@ -73,8 +73,6 @@ end
 
 
 while hit < n
-    
-    %beta = circ_vmrnd(0,Lmin/4,[sf*n size(mu,2)]);      % In column vector
     for i = 1 : size(mu,2)
         beta(:,i) = circ_vmrnd(0,Lmin/4,sf *n);
     end

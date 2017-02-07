@@ -44,7 +44,8 @@ function vmm = fitvmmdist(X,k,varargin)
 %                       S.Kappa:        A K-by-M matrix specifying the 
 %                                       concentration matrix of each 
 %                                       component
-%                       S.Lambda:       A K-by-1 column vector containing
+%                       S.Lambda:       No Lambda for univariate fitting
+%                                       A K-by-1 column vector containing
 %                                       correlation parameters in 2D case
 %                                       or A M-by-M-by-K array otherwise
 %

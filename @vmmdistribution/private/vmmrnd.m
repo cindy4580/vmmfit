@@ -1,16 +1,19 @@
 function [y, compIdx] = vmmrnd(mu,kappa,lambda,p,type,n)
-%VMMDISTRIBUTION/VMMRND Random vectors from a bivariate von Mises mixture 
-%                       distribution
-%   Y = VMMRND(MU,KAPPA,LAMBDA,P,TYPE,N) returns an N-by-2 matrix Y of
-%   random vectors chosen from 2D von Mises mixture model whose K
-%   components are bivariate von Mises distributions with mean vectors
-%   given by MU, concentration and correlation vectors given by KAPPA and
-%   LAMBDA. MU and KAPPA are K-by-2 matrices, where MU(:,J) and Kappa(:,J)
-%   are the man direction and concentration of component J. Lambda and P
-%   are 1-by-K vectors which define the correlation parameters and mixture
-%   weights respectively. If P does not sum to 1, VMMRND normalizes it. If
-%   P is not given, each component will get equal probability. If TYPE is 
-%   not given, VMMRND will adopt Sine model. The default value for N is 1
+%VMMDISTRIBUTION/VMMRND Random vectors from a multi-variate von Mises 
+%                       mixture distribution
+%
+%   Y = VMMRND(MU,KAPPA,LAMBDA,P,TYPE,N) returns an N-by-M matrix Y of
+%   random vectors chosen from a multi-variatevon Mises mixture model whose 
+%   K components are multi-variate von Mises distributions with mean 
+%   vectors given by MU, concentration and correlation vectors given by 
+%   KAPPA and LAMBDA. MU and KAPPA are K-by-M matrices, where MU(:,J) and 
+%   Kappa(:,J) are the man direction and concentration of component J. P is
+%   a 1-by-K vector which defines mixing weights for the K components. If P
+%   does not sum to 1, VMMRND normalizes it automatically. If P is not 
+%   given, each component will get equal probability. For the 2D case,
+%   Lambda is also a 1-by-K correlation vector while for multi-variable 
+%   distributions, Lambda is a M-by-M-by-K matrix. If TYPE is not given,
+%   VMMRND will adopt Sine model. The default value for N is 1
 %   
 %   [Y, COMPIDX] = VMMRND(MU,KAPPA,LAMBDA,P,TYPE,N) returns an N-by-1
 %   vector COMPIDX which contains the index of the component used to
@@ -25,7 +28,7 @@ function [y, compIdx] = vmmrnd(mu,kappa,lambda,p,type,n)
 %
 %
 %   REFERENCE: MATLAB Machine Learning Toolbox
-%   Copyright: Xindi Li     Xindi.li@stonybrook.edu
+%   Copyright: Xindi Li (Xindi.li@stonybrook.edu)
 
 %% Check Inputs
 if nargin < 3 || isempty(mu) || isempty(kappa) || isempty(lambda)
@@ -34,7 +37,7 @@ elseif ~ismatrix(mu)
     error('BadMu');
 elseif ~ismatrix(kappa)
     error('BadKappa');
-elseif ~isvector(lambda)
+elseif ~isnumeric(lambda)
     error('BadLambda');
 end
 
@@ -74,15 +77,25 @@ end
 %% Randomly pick from the components
 compIdx = randsample(length(p),n,true,p/sum(p));
 y = zeros(n,d,superiorfloat(mu,kappa,lambda));
+
 if CorType              % Sine Model
     for i = 1 : K 
         label = (compIdx == i);
-        y(label,:) = bvmrnd(mu(i,:),kappa(i,:),lambda(i),sum(label==1));
+        if d == 2
+            y(label,:) = mvmrnd(mu(i,:),kappa(i,:),lambda(i),sum(label==1));
+        else
+            y(label,:) = mvmrnd(mu(i,:),kappa(i,:),lambda(:,:,i),...
+                         sum(label==1));
+        end
     end % K components
 else                    % Cosine Model
     for i = 1 : K
         label = (compIdx == i);
-        y(label,:) = bvmrnd1(mu(i,:),kappa(i,:),lambda(i),sum(label==1));
+        if d == 2
+            y(label,:) = mvmrnd1(mu(i,:),kappa(i,:),lambda(i),sum(label==1));
+        else
+            y(label,:) = mvmrnd1(mu(i,:),kappa(i,:).lambda(:,:,i),sum(label==1));
+        end   
     end % K components
 end % Cortype
 end % function

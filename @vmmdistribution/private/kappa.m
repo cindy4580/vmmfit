@@ -17,9 +17,6 @@ function k = kappa( alpha )
 if nargin >2 
     error('TooManyInputs');
 end
-if size(alpha,2) ~= 2
-    error('2DInputOnly');
-end
 
 % Initialization
 l = size(alpha,1);
