@@ -171,8 +171,10 @@ methods
         [k1,d1] = size(Mu); 
         [k2,d2] = size(Kappa);
         
-        if ismatrix(R)
+        if isvector(R)
             k = length(R);
+        elseif length(size(R)) == 2
+            k = 1;
         else
            [dr,~,k] = size(R);
            if dr ~= d1

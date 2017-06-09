@@ -45,7 +45,9 @@ end
 
 if size(kappa,1) ~= K || size(kappa,2) ~= d
     error('MuConcenSizeMismatch');
-elseif length(lambda) ~= K
+elseif isvector(lambda) && length(lambda) ~= K
+    error('MuCorSizeMismatch');
+elseif length(size(lambda))> 2 && size(lambda,3) ~= K
     error('MuCorSizeMismatch');
 end
 
